@@ -344,7 +344,6 @@ class GenericCoreNLPParser(ParserI, TokenizerI, TaggerI):
             for token in sentence["tokens"]:
                 yield token["originalText"] or token["word"]
 
-    # Mike014 
     def tag_sents(self, sentences, properties=None):
         """
         Tag multiple sentences.
@@ -356,18 +355,15 @@ class GenericCoreNLPParser(ParserI, TokenizerI, TaggerI):
         :type sentences: list(list(str))
         :rtype: list(list(tuple(str, str))
         """
-        # Old code
+
         # Converting list(list(str)) -> list(str)
         sentences = (" ".join(words) for words in sentences)
-        # return [sentences[0] for sentences in self.raw_tag_sents(sentences)]
 
         if properties is None:
             properties = {'tokenize.whitespace': 'true', "ner.useSUTime": "false"}
 
         return [sentences[0] for sentences in self.raw_tag_sents(sentences, properties)]
 
-    # Mike014
-    # Added properties input and in return
     def tag(self, sentence: str, properties=None) -> List[Tuple[str, str]]:
         """
         Tag a list of tokens.
@@ -399,7 +395,6 @@ class GenericCoreNLPParser(ParserI, TokenizerI, TaggerI):
         """
         return self.tag_sents([sentence], properties)[0]
 
-    # Mike014
     def raw_tag_sents(self, sentences, properties=None):
         """
         Tag multiple sentences.
