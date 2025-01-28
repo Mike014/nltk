@@ -344,7 +344,8 @@ class GenericCoreNLPParser(ParserI, TokenizerI, TaggerI):
             for token in sentence["tokens"]:
                 yield token["originalText"] or token["word"]
 
-    def tag_sents(self, sentences):
+    # Mike014 
+    def tag_sents(self, sentences, properties=None):
         """
         Tag multiple sentences.
 
@@ -355,11 +356,19 @@ class GenericCoreNLPParser(ParserI, TokenizerI, TaggerI):
         :type sentences: list(list(str))
         :rtype: list(list(tuple(str, str))
         """
+        # Old code
         # Converting list(list(str)) -> list(str)
         sentences = (" ".join(words) for words in sentences)
-        return [sentences[0] for sentences in self.raw_tag_sents(sentences)]
+        # return [sentences[0] for sentences in self.raw_tag_sents(sentences)]
 
-    def tag(self, sentence: str) -> List[Tuple[str, str]]:
+        if properties is None:
+            properties = {'tokenize.whitespace': 'true', "ner.useSUTime": "false"}
+
+        return [sentences[0] for sentences in self.raw_tag_sents(sentences, properties)]
+
+    # Mike014
+    # Added properties input and in return
+    def tag(self, sentence: str, properties=None) -> List[Tuple[str, str]]:
         """
         Tag a list of tokens.
 
@@ -388,9 +397,10 @@ class GenericCoreNLPParser(ParserI, TokenizerI, TaggerI):
         ('unladen', 'JJ'), ('swallow', 'VB'), ('?', '.')]
         >>> server.stop()
         """
-        return self.tag_sents([sentence])[0]
+        return self.tag_sents([sentence], properties)[0]
 
-    def raw_tag_sents(self, sentences):
+    # Mike014
+    def raw_tag_sents(self, sentences, properties=None):
         """
         Tag multiple sentences.
 
@@ -404,20 +414,15 @@ class GenericCoreNLPParser(ParserI, TokenizerI, TaggerI):
             "ssplit.isOneSentence": "true",
             "annotators": "tokenize,ssplit,",
         }
-
+        default_properties.update(properties or {})
+        
         # Supports only 'pos' or 'ner' tags.
-        assert self.tagtype in ["pos", "ner"]
+        assert self.tagtype in ["pos", "ner"], "CoreNLP tagger supports only 'pos' or 'ner' tags."
         default_properties["annotators"] += self.tagtype
         for sentence in sentences:
             tagged_data = self.api_call(sentence, properties=default_properties)
-            yield [
-                [
-                    (token["word"], token[self.tagtype])
-                    for token in tagged_sentence["tokens"]
-                ]
-                for tagged_sentence in tagged_data["sentences"]
-            ]
-
+            yield [[(token["word"], token[self.tagtype]) for token in tagged_sentence["tokens"]]
+                for tagged_sentence in tagged_data["sentences"]]
 
 class CoreNLPParser(GenericCoreNLPParser):
     """
