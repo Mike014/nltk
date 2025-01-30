@@ -1745,14 +1745,10 @@ class PunktTokenizer(PunktSentenceTokenizer):
 
     def load_lang(self, lang="english"):
         from nltk.data import find
-        
-        # try:
-        #     lang_dir = find(f"tokenizers/punkt_tab/{lang}.pickle")
-        # except LookupError:
-        #     lang_dir = find(f"tokenizers/punkt/{lang}.pickle")
 
-        lang_dir = find(f"tokenizers/punkt/{lang}.pickle")
-
+        with open(find(f"tokenizers/punkt/{lang}.pickle"), "rb") as f:
+            self._params = pickle.load(f)
+    
         self._params = load_punkt_params(lang_dir)
         self._lang = lang
 
