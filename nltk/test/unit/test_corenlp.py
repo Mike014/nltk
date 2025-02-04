@@ -14,23 +14,23 @@ from nltk.tree import Tree
 def setup_module(module):
     global server
 
-    try:
-        server = corenlp.CoreNLPServer(port=9000)
-    except LookupError:
-        pytest.skip("Could not instantiate CoreNLPServer.")
+    # try:
+    # server = corenlp.CoreNLPServer(port=9000)
+    # except LookupError:
+    #     pytest.skip("Could not instantiate CoreNLPServer.")
 
-    try:
-        server.start()
-    except corenlp.CoreNLPServerError as e:
-        pytest.skip(
-            "Skipping CoreNLP tests because the server could not be started. "
-            "Make sure that the 9000 port is free. "
-            "{}".format(e.strerror)
-        )
+    # try:
+    # server.start()
+    # except corenlp.CoreNLPServerError as e:
+    #     pytest.skip(
+    #         "Skipping CoreNLP tests because the server could not be started. "
+    #         "Make sure that the 9000 port is free. "
+    #         "{}".format(e.strerror)
+    #     )
 
 
-def teardown_module(module):
-    server.stop()
+# def teardown_module(module):
+#     server.stop()
 
 
 class TestTokenizerAPI(TestCase):
@@ -581,6 +581,8 @@ class TestTaggerAPI(TestCase):
             properties={
                 "ssplit.isOneSentence": "true",
                 "annotators": "tokenize,ssplit,pos",
+                "tokenize.whitespace": "true",
+                "ner.useSUTime": "false",
             },
         )
         self.assertEqual(expected_output, tagged_output)
@@ -740,6 +742,8 @@ class TestTaggerAPI(TestCase):
             properties={
                 "ssplit.isOneSentence": "true",
                 "annotators": "tokenize,ssplit,ner",
+                "tokenize.whitespace": "true",
+                "ner.useSUTime": "false",
             },
         )
         self.assertEqual(expected_output, tagged_output)

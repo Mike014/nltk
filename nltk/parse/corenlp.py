@@ -360,7 +360,7 @@ class GenericCoreNLPParser(ParserI, TokenizerI, TaggerI):
         sentences = (" ".join(words) for words in sentences)
 
         if properties is None:
-            properties = {'tokenize.whitespace': 'true', "ner.useSUTime": "false"}
+            properties = {"tokenize.whitespace": "true", "ner.useSUTime": "false"}
 
         return [sentences[0] for sentences in self.raw_tag_sents(sentences, properties)]
 
@@ -410,14 +410,23 @@ class GenericCoreNLPParser(ParserI, TokenizerI, TaggerI):
             "annotators": "tokenize,ssplit,",
         }
         default_properties.update(properties or {})
-        
+
         # Supports only 'pos' or 'ner' tags.
-        assert self.tagtype in ["pos", "ner"], "CoreNLP tagger supports only 'pos' or 'ner' tags."
+        assert self.tagtype in [
+            "pos",
+            "ner",
+        ], "CoreNLP tagger supports only 'pos' or 'ner' tags."
         default_properties["annotators"] += self.tagtype
         for sentence in sentences:
             tagged_data = self.api_call(sentence, properties=default_properties)
-            yield [[(token["word"], token[self.tagtype]) for token in tagged_sentence["tokens"]]
-                for tagged_sentence in tagged_data["sentences"]]
+            yield [
+                [
+                    (token["word"], token[self.tagtype])
+                    for token in tagged_sentence["tokens"]
+                ]
+                for tagged_sentence in tagged_data["sentences"]
+            ]
+
 
 class CoreNLPParser(GenericCoreNLPParser):
     """
